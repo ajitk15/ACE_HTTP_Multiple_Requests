@@ -1,0 +1,17 @@
+
+
+CREATE COMPUTE MODULE store_result1_gen_url
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		DECLARE I INTEGER 1;
+		FOR atchildren AS InputRoot.JSON.Data.children.Item[] DO
+			IF InputRoot.JSON.Data.children.Item[I].active[1].state = 'started' THEN
+				SET Environment.result1.IntegrationServer = InputRoot.JSON.Data.children.Item[I].name;
+				SET OutputLocalEnvironment.Destination.HTTP.RequestURL = 'http://localhost:4414/apiv2/servers/' || FIELDVALUE(InputRoot.JSON.Data.children.Item[I].name) || '/applications';
+				PROPAGATE TO TERMINAL 'out';
+			END IF;
+		SET I = I + 1;
+		END FOR;
+		RETURN FALSE;
+	END;
+END MODULE;

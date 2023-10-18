@@ -1,0 +1,16 @@
+
+
+CREATE COMPUTE MODULE combine_results
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		CREATE FIELD OutputRoot.JSON.Data IDENTITY(JSON.Array)Data;
+		SET OutputRoot.JSON.Data.Item.InstegrationServer = FIELDVALUE(Environment.result1.IntegrationServer);
+		DECLARE I INTEGER 1;
+		CREATE FIELD OutputRoot.JSON.Data.Item.child IDENTITY(JSON.Array)child;
+		FOR atChild AS InputRoot.JSON.Data.children.Item[] DO
+			CREATE LASTCHILD OF OutputRoot.JSON.Data.Item.child.Item NAME 'application' || CAST(I AS CHAR) VALUE FIELDVALUE(InputRoot.JSON.Data.children.Item[I].name);
+			SET I = I + 1;
+		END FOR;
+		RETURN TRUE;
+	END;
+END MODULE;
